@@ -175,8 +175,8 @@ public class Main {
 
     private static void usage() {
         error("Usage:\n" //
-                + "java -jar jmxstat.jar <host:port> "
-                + "[--peformGC] [--contention] [mbean.name[attribute.field], ...] [interval [count]]", 1);
+                + "jmxstat <host:port> "
+                + "[--performGC] [--contention] [mbean.name[attribute.field], ...] [interval [count]]", 1);
     }
 
     private static String now() {

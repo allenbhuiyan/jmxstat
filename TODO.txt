@@ -3,3 +3,5 @@
 #+AUTHOR: Benoit Delbosc
 
 * Features
+** executable jar
+   try http://skife.org/java/unix/2011/06/20/really_executable_jars.html
