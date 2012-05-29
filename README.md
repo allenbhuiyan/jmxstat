@@ -21,6 +21,8 @@ DESCRIPTION
                          query in the following format:
     
                             mbeanDomain:mbeanKey=mbeanValues,...[mbeanAttribute1[.field],...]
+                         
+                         If the attribute starts with '!' invoke the method.
 
     --contention         Render blockedCount and blockedTime for all threads.
                          blockedCount is the total number of times threads
@@ -59,6 +61,10 @@ EXAMPLES
     Perform a Full garbage collector:
 
         jmxstat localhost:9999 --performGC
+
+    Same but using a method invocation:
+
+        jmxstat localhost:1089  java.lang:type=Memory[!gc]
 
 INSTALL/DOWNLOAD
 
