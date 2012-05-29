@@ -85,9 +85,9 @@ public class Main {
         List<MbeanAttr> attrs = null;
 
         public Options(String[] args) {
-	    if (args.length < 2) {
-		usage();
-	    }
+            if (args.length < 2) {
+                usage();
+            }
             url = args[0];
             // Check for the last 2 args if they are interval/count
             int i = 0;
@@ -118,8 +118,7 @@ public class Main {
                     disableContention = true;
                     contention = false;
                     continue;
-                }
-                else if (PERFORM_GC_ARG.equals(def)) {
+                } else if (PERFORM_GC_ARG.equals(def)) {
                     performGC = true;
                     continue;
                 }
@@ -176,7 +175,8 @@ public class Main {
     private static void usage() {
         error("Usage:\n" //
                 + "jmxstat <host:port> "
-                + "[--performGC] [--contention] [mbean.name[attribute.field], ...] [interval [count]]", 1);
+                + "[--performGC] [--contention] [mbean.name[attribute.field], ...] [interval [count]]",
+                1);
     }
 
     private static String now() {
@@ -195,7 +195,7 @@ public class Main {
 
     /**
      * Enable or disable the thread contention monitoring.
-     *
+     * 
      */
     private static void setContentionMonitoring(MBeanServerConnection mbsc,
             Boolean value) throws MalformedObjectNameException,
@@ -211,20 +211,20 @@ public class Main {
         Attribute attribute = new Attribute(CONTENTION_ATTR, value);
         mbsc.setAttribute(objectName, attribute);
         // System.out.println(CONTENTION_ATTR + ":" + val.toString() + " to "
-        //        + value.toString());
+        // + value.toString());
     }
 
     /**
      * Write sum of blockedCount and blocketTime for all threads.
-     *
+     * 
      * blockedCount: Returns the total number of times that the thread
      * associated with this ThreadInfo blocked to enter or reenter a monitor.
-     *
+     * 
      * blockedTime: Returns the approximate accumulated elapsed time (in
      * milliseconds) that the thread associated with this ThreadInfo has blocked
      * to enter or reenter a monitor since thread contention monitoring is
      * enabled.
-     *
+     * 
      * */
     private static void writeContentionInfo(MBeanServerConnection mbsc,
             StringBuilder out) throws MalformedObjectNameException,
@@ -291,10 +291,10 @@ public class Main {
                 }
                 if (options.performGC) {
                     performGC(mbsc);
-		    System.out.println(now());
+                    System.out.println(now());
                 }
                 // successful connection
-                if (! options.contention && options.attrs.size() == 0) {
+                if (!options.contention && options.attrs.size() == 0) {
                     return;
                 }
                 for (;;) {
@@ -303,8 +303,13 @@ public class Main {
                     out.append("\t");
                     // Read each mbean attribute specified on the command line
                     for (MbeanAttr attr : options.attrs) {
-                        Object val = mbsc.getAttribute(attr.name, attr.attr);
-
+                        Object val;
+                        if (attr.attr.startsWith("!")) {
+                            val = mbsc.invoke(attr.name,
+                                    attr.attr.substring(1), null, null);
+                        } else {
+                            val = mbsc.getAttribute(attr.name, attr.attr);
+                        }
                         // Read fields from CompositeData attributes if user
                         // specified a sub-attribute
                         // via dot notation (e.g.
