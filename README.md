@@ -64,7 +64,12 @@ EXAMPLES
 
     Same but using a method invocation:
 
-        jmxstat localhost:1089  java.lang:type=Memory[!gc]
+        jmxstat localhost:1089  java.lang:type=Memory[!gc] 1 1
+
+    Invoking method with parameters:
+
+        jmxstat localhost:1089  localhost:1089  org.nuxeo:name=EventMonitoring,type=service[!setListenerEnabledFlag/auditLoggerListener/false] 1 1
+
 
 INSTALL/DOWNLOAD
 

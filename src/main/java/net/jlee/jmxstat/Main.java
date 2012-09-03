@@ -70,6 +70,8 @@ public class Main {
 
         private static final Object PERFORM_GC_ARG = "--performGC";
 
+        private static final Object QUIET_ARG = "--quiet";
+
         String url;
 
         int interval;
@@ -81,6 +83,8 @@ public class Main {
         boolean disableContention = false;
 
         boolean performGC = false;
+
+        boolean quiet = false;
 
         List<MbeanAttr> attrs = null;
 
@@ -121,6 +125,8 @@ public class Main {
                 } else if (PERFORM_GC_ARG.equals(def)) {
                     performGC = true;
                     continue;
+                } else if (QUIET_ARG.equals(def)) {
+                    quiet = true;
                 }
                 int startIdx = def.indexOf("[");
                 int endIdx = def.lastIndexOf("]");
@@ -175,7 +181,7 @@ public class Main {
     private static void usage() {
         error("Usage:\n" //
                 + "jmxstat <host:port> "
-                + "[--performGC] [--contention] [mbean.name[attribute.field], ...] [interval [count]]",
+                + "[--performGC] [--contention] [--quiet] [mbean.name[attribute.field], ...] [interval [count]]",
                 1);
     }
 
@@ -195,7 +201,7 @@ public class Main {
 
     /**
      * Enable or disable the thread contention monitoring.
-     * 
+     *
      */
     private static void setContentionMonitoring(MBeanServerConnection mbsc,
             Boolean value) throws MalformedObjectNameException,
@@ -216,15 +222,15 @@ public class Main {
 
     /**
      * Write sum of blockedCount and blocketTime for all threads.
-     * 
+     *
      * blockedCount: Returns the total number of times that the thread
      * associated with this ThreadInfo blocked to enter or reenter a monitor.
-     * 
+     *
      * blockedTime: Returns the approximate accumulated elapsed time (in
      * milliseconds) that the thread associated with this ThreadInfo has blocked
      * to enter or reenter a monitor since thread contention monitoring is
      * enabled.
-     * 
+     *
      * */
     private static void writeContentionInfo(MBeanServerConnection mbsc,
             StringBuilder out) throws MalformedObjectNameException,
@@ -304,11 +310,40 @@ public class Main {
                     // Read each mbean attribute specified on the command line
                     for (MbeanAttr attr : options.attrs) {
                         Object val;
-                        if (attr.attr.startsWith("!")) {
-                            val = mbsc.invoke(attr.name,
-                                    attr.attr.substring(1), null, null);
+                        if (!attr.attr.startsWith("!")) {
+                            try {
+                                val = mbsc.getAttribute(attr.name, attr.attr);
+                            } catch (AttributeNotFoundException e) {
+                                if (! options.quiet) {
+                                    throw(e);
+                                } else {
+                                    continue;
+                                }
+                            }
                         } else {
-                            val = mbsc.getAttribute(attr.name, attr.attr);
+                            // execute operation, params are separated with /
+                            String[] items = attr.attr.substring(1).split("/");
+                            String operationName = items[0];
+                            Object params[] = null;
+                            String signatures[] = null;
+                            int nbParams = items.length - 1;
+                            if (nbParams > 0) {
+                                params = new Object[items.length - 1];
+                                signatures = new String[items.length - 1];
+                                for (int j = 0; j < nbParams; j++) {
+                                    String param = items[j + 1];
+                                    if ("true".equals(param)
+                                            || "false".equals(param)) {
+                                        params[j] = Boolean.valueOf(param).booleanValue();
+                                        signatures[j] = "boolean";
+                                    } else {
+                                        params[j] = param;
+                                        signatures[j] = String.class.getName();
+                                    }
+                                }
+                            }
+                            val = mbsc.invoke(attr.name, operationName, params,
+                                    signatures);
                         }
                         // Read fields from CompositeData attributes if user
                         // specified a sub-attribute

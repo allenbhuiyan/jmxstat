@@ -2,6 +2,9 @@
 #+TITLE: jmxstat changelog
 #+AUTHOR: Benoit Delbosc
 
+* Version 0.4.0 2012-09-03
+** Enable operation invocation with params only boolean and String so far
+** Adding a quiet mode to be silent if attribute does not exists
 * Version 0.3.0 2012-05-29
 ** Enable operation invocation
 * Version 0.2.1 2011-05-19
