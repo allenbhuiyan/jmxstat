@@ -314,8 +314,8 @@ public class Main {
                             try {
                                 val = mbsc.getAttribute(attr.name, attr.attr);
                             } catch (AttributeNotFoundException e) {
-                                if (! options.quiet) {
-                                    throw(e);
+                                if (!options.quiet) {
+                                    throw (e);
                                 } else {
                                     continue;
                                 }
@@ -342,8 +342,16 @@ public class Main {
                                     }
                                 }
                             }
-                            val = mbsc.invoke(attr.name, operationName, params,
-                                    signatures);
+                            try {
+                                val = mbsc.invoke(attr.name, operationName,
+                                        params, signatures);
+                            } catch (InstanceNotFoundException e) {
+                                if (!options.quiet) {
+                                    throw (e);
+                                } else {
+                                    continue;
+                                }
+                            }
                         }
                         // Read fields from CompositeData attributes if user
                         // specified a sub-attribute
