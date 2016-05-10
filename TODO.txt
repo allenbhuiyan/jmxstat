@@ -1,6 +1,6 @@
 #    -*- mode: org -*-
 #+TITLE: jmxstat to do list
-#+AUTHOR: Benoit Delbosc
+#+AUTHOR: Benoit Delbosc hah ha
 
 * Features
 ** executable jar
